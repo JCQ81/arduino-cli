@@ -72,27 +72,29 @@ void ardcli::begin(void(*onExecPtr)(char data[]), void(*onHelpPtr)(char data[]))
 
 ardcli ardCli;
 
-// Workaround for a bug i'm unable to fix at this moment... :(
-void fixlen(size_t dlen) {
-  Serial.print(dlen);    
-  Serial.print("\r        \r");
-}
-
-char** strSplit(char data[], char delimiters[]) {   
-  size_t dlen = strlen(data);
-  fixlen(dlen);      
-  char tdata[dlen];  
-  for (int i = 0; i <= dlen; i++)
-    tdata[i] = data[i];     
-  byte cnt = 0;
-  char* ptr = strtok(tdata, delimiters);  
-  char** result = new char*[10];  
-  for (int i = 0; i < 10; i++)     
-    result[i] = "";
-  while(ptr != NULL) {
-    result[cnt] = ptr;
-    cnt++;
-    ptr = strtok(NULL, delimiters);
+char** strSplit(char str[], char delimiter) {  
+  char* prev = str-1;
+  char* pcur = strchr(str,delimiter);
+  char* pend = strchr(str,NULL);
+  char** result = new char*[10];
+  byte i = 0;
+  while (pcur!=NULL)
+  {    
+    char dest[10] = "";
+    strncpy(dest, prev+1,pcur-prev-1);    
+    prev = pcur;
+    pcur = strchr(pcur+1,delimiter);
+    result[i] = new char[10];
+    strcpy(result[i],dest);    
+    i++;
+  }  
+  char dest[10] = "";
+  strncpy(dest, prev+1,pend-prev-1);
+  result[i] = new char[10];
+  strcpy(result[i],dest);
+  for (byte j=i+1; j<10; j++) {
+    result[j] = new char[10];
+    strcpy(result[j],"");
   }  
   return result;
 }
